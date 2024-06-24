@@ -2,8 +2,9 @@
 import {Command} from "commander";
 import figlet from "figlet";
 import chalk from "chalk";
+import {createCommand} from "./commands/create.command.mjs";
 
-export const program: Command = new Command();
+const program: Command = new Command();
 const version: string = "1.0.0";
 const description: string = "A CLI tool to create and manage Spring Boot projects.";
 
@@ -16,7 +17,9 @@ program
         );
         console.log("\nWelcome to Spring CLI!");
         console.log(description);
-        console.log("\nType 'spring --help' to see the list of commands.");
+        console.log("\nType 'sc --help' to see the list of commands.");
     });
+
+program.addCommand(createCommand);
 
 program.parse(process.argv);
