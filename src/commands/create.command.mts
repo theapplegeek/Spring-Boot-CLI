@@ -3,14 +3,20 @@ import inquirer from "inquirer";
 import {isValidMavenArtifactId, isValidMavenGroupId, isValidProjectName} from "../utils/validator.utils.mjs";
 import chalk from "chalk";
 import path from "node:path";
-import {createFolder} from "../utils/file-manager.utils.mjs";
+import {createFolder, readFile, writeFile} from "../utils/file-manager.utils.mjs";
+import {cloneStarterPack} from "../utils/git.utils.mjs";
 import ora, {Ora} from "ora";
+import {parseObjectToXmlString, parseStringToXml} from "../utils/xml.utils.mjs";
+import {Pom} from "../models/pom.model.mjs";
 
 const createCommand: Command = new Command("create")
     .command("create")
     .description("Create a new spring boot project with starter pack")
     .argument("<name>", "Name of the project")
     .action(async (name: string): Promise<void> => {
+        // =========================================
+        // Validate parameters
+        // =========================================
         if (!validateName(name)) {
             console.error(chalk.red("Please enter a valid project name"));
             process.exit(1);
@@ -23,14 +29,38 @@ const createCommand: Command = new Command("create")
         console.log(`Artifact Id: ${artifactId}`);
         console.log(`Package Name: ${packageName}`);
 
+        // =========================================
+        // Loading spinner
+        // =========================================
         const spinner: Ora = ora(`Creating project folder...\n`).start(); // Start the spinner
+
+        // =========================================
+        // Create project folder
+        // =========================================
+        spinner.start(`Creating project folder...`);
         const projectPath: string = path.join(process.cwd(), name);
         createFolder(projectPath);
         spinner.info(`Project folder created at ${projectPath}`);
-        spinner.start(`Cloning starter pack...`)
-        setTimeout(() => {
-            spinner.succeed(chalk.green(`Project created at ${projectPath}`));
-        }, 10000);
+
+        // =========================================
+        // Clone starter pack from git
+        // =========================================
+        spinner.start(`Cloning starter pack...`);
+        await cloneStarterPack(projectPath);
+        spinner.info(`Starter pack cloned at ${projectPath}`);
+
+        // =========================================
+        // Edit pom.xml
+        // =========================================
+        spinner.start(`Generating project...`);
+        const pomPath = path.join(projectPath, "pom.xml");
+        const pom: string = readFile(pomPath);
+        let pomXml: Pom = await parseStringToXml(pom);
+        pomXml = editPom(pomXml, groupId, artifactId, name);
+        const pomString: string = await parseObjectToXmlString(pomXml);
+        writeFile(pomPath, pomString);
+
+        spinner.succeed(chalk.green(`Project created at ${projectPath}`));
     });
 
 const validateName = (input: string): boolean => {
@@ -73,6 +103,16 @@ const getArtifactId = async (): Promise<string> => {
     }).then((answers: { artifactId: string }) => {
         return answers.artifactId as string
     });
+}
+
+const editPom = (pom: Pom, groupId: string, artifactId: string, name: string): Pom => {
+    pom.project.groupId[0] = groupId;
+    pom.project.artifactId[0] = artifactId;
+    pom.project.name[0] = name;
+    pom.project.description[0] = 'Insert project description here';
+    delete pom.project.licenses[0];
+    delete pom.project.developers[0];
+    return pom;
 }
 
 export {
