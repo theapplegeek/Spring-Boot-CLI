@@ -21,6 +21,7 @@ import {parseObjectToYamlString, parseStringToYaml} from "../utils/yaml.utils.mj
 
 const createCommand: Command = new Command("create")
     .command("create")
+    .alias("c")
     .description("Create a new spring boot project with starter pack")
     .argument("<name>", "Name of the project")
     .action(async (name: string): Promise<void> => {

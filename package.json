@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "node dist/cli.mjs",
-    "build": "tsc"
+    "build": "tsc",
+    "publish": "tsc && npm publish"
   },
   "keywords": [
     "spring",
