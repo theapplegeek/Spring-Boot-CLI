@@ -1,5 +1,5 @@
 {
-  "name": "spring-cli",
+  "name": "spring-boot-cli",
   "version": "1.0.0",
   "description": "CLI for Spring Boot",
   "main": "dist/cli.mjs",
@@ -15,7 +15,8 @@
     "spring",
     "cli",
     "spring-boot",
-    "spring-cli"
+    "spring-cli",
+    "spring-boot-cli"
   ],
   "author": "Weibin Xu",
   "license": "MIT",
