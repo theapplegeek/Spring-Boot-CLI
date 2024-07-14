@@ -3,11 +3,21 @@ import inquirer from "inquirer";
 import {isValidMavenArtifactId, isValidMavenGroupId, isValidProjectName} from "../utils/validator.utils.mjs";
 import chalk from "chalk";
 import path from "node:path";
-import {createFolder, readFile, writeFile} from "../utils/file-manager.utils.mjs";
-import {cloneStarterPack} from "../utils/git.utils.mjs";
+import crypto from "crypto";
+import {
+    copyFiles,
+    createFolder,
+    deleteFolder,
+    getJavaFiles,
+    readFile,
+    renameFile,
+    writeFile
+} from "../utils/file-manager.utils.mjs";
+import {cloneStarterPack, commitInitialProject} from "../utils/git.utils.mjs";
 import ora, {Ora} from "ora";
 import {parseObjectToXmlString, parseStringToXml} from "../utils/xml.utils.mjs";
 import {Pom} from "../models/pom.model.mjs";
+import {parseObjectToYamlString, parseStringToYaml} from "../utils/yaml.utils.mjs";
 
 const createCommand: Command = new Command("create")
     .command("create")
@@ -23,11 +33,6 @@ const createCommand: Command = new Command("create")
         }
         const groupId: string = await getGroupId();
         const artifactId: string = await getArtifactId();
-        const packageName: string = `${groupId.replaceAll("-", "_")}.${artifactId.replaceAll("-", "_")}`;
-        console.log(`Project Name: ${name}`);
-        console.log(`Group Id: ${groupId}`);
-        console.log(`Artifact Id: ${artifactId}`);
-        console.log(`Package Name: ${packageName}`);
 
         // =========================================
         // Loading spinner
@@ -47,20 +52,79 @@ const createCommand: Command = new Command("create")
         // =========================================
         spinner.start(`Cloning starter pack...`);
         await cloneStarterPack(projectPath);
+        deleteFolder(path.join(projectPath, ".git"));
         spinner.info(`Starter pack cloned at ${projectPath}`);
 
         // =========================================
         // Edit pom.xml
         // =========================================
         spinner.start(`Generating project...`);
-        const pomPath = path.join(projectPath, "pom.xml");
+        const pomPath: string = path.join(projectPath, "pom.xml");
         const pom: string = readFile(pomPath);
         let pomXml: Pom = await parseStringToXml(pom);
         pomXml = editPom(pomXml, groupId, artifactId, name);
         const pomString: string = await parseObjectToXmlString(pomXml);
         writeFile(pomPath, pomString);
 
-        spinner.succeed(chalk.green(`Project created at ${projectPath}`));
+        // =========================================
+        // Replace imports in java files with groupId
+        // =========================================
+        const javaFilePattern: string = path.join(projectPath, "src", "main", "java", "**", "*.java");
+        let javaFiles: string[] = getJavaFiles(javaFilePattern);
+        javaFiles.forEach((file: string) => {
+            let fileContent: string = readFile(file);
+            fileContent = fileContent.replaceAll("it.theapplegeek.spring_starter_pack", `${groupId.replaceAll("-", "_")}.${artifactId.replaceAll("-", "_")}`);
+            writeFile(file, fileContent);
+        });
+
+        // =========================================
+        // Rename main application class
+        // =========================================
+        const mainApplicationPath: string = path.join(projectPath, "src", "main", "java", "it", "theapplegeek", "spring_starter_pack", "Application.java");
+        let mainApplicationContent: string = readFile(mainApplicationPath);
+        const artifactIdCamelCase: string = artifactId.split(/[.-]/).map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join("");
+        mainApplicationContent = mainApplicationContent.replaceAll("class Application", `class ${artifactIdCamelCase}Application`);
+        mainApplicationContent = mainApplicationContent.replaceAll("Application.class", `${artifactIdCamelCase}Application.class`);
+        writeFile(mainApplicationPath, mainApplicationContent);
+        const mainApplicationNewPath: string = path.join(projectPath, "src", "main", "java", "it", "theapplegeek", "spring_starter_pack", `${artifactIdCamelCase}Application.java`);
+        renameFile(mainApplicationPath, mainApplicationNewPath);
+
+        // =========================================
+        // Edit application.yml
+        // =========================================
+        const applicationYmlPath: string = path.join(projectPath, "src", "main", "resources", "application.yml");
+        const applicationYmlFile: string = readFile(applicationYmlPath);
+        let applicationYmlContent: any = parseStringToYaml(applicationYmlFile);
+        applicationYmlContent.spring.application.name = artifactId.split(/[.-]/).map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+        const secretKeyHex: string = crypto.randomBytes(32).toString('hex');
+        const secretKeyBase64: string = Buffer.from(secretKeyHex).toString('base64');
+        applicationYmlContent.application.security.jwt['secret-key'] = secretKeyBase64;
+        applicationYmlContent = parseObjectToYamlString(applicationYmlContent);
+        writeFile(applicationYmlPath, applicationYmlContent);
+
+        // =========================================
+        // Replace package path with groupId and artifactId
+        // =========================================
+        const groupIdSplit: string[] = groupId.replaceAll("-", "_").split(".");
+        const artifactIdSplit: string[] = artifactId.replaceAll("-", "_").split(".");
+        const defaultFolderPath: string = path.join(projectPath, "src", "main", "java", "it", "theapplegeek", "spring_starter_pack");
+        const newFolderPath: string = path.join(projectPath, "src", "main", "java", ...groupIdSplit, ...artifactIdSplit);
+        createFolder(newFolderPath, false);
+        copyFiles(defaultFolderPath, newFolderPath);
+        deleteDefaultFolder(groupId, artifactId, projectPath);
+        spinner.info(`Project created at ${projectPath}`);
+
+        // =========================================
+        // Commit initial project
+        // =========================================
+        spinner.start(`Initializing git...`);
+        await commitInitialProject(projectPath);
+        spinner.info(`Git initialized`);
+
+        spinner.succeed(chalk.green(`Project created successfully!`));
+        console.log(`\nNext steps:`);
+        console.log(`1. cd ${name}`);
+        console.log(`2. open the project in your favorite IDE`);
     });
 
 const validateName = (input: string): boolean => {
@@ -113,6 +177,17 @@ const editPom = (pom: Pom, groupId: string, artifactId: string, name: string): P
     delete pom.project.licenses[0];
     delete pom.project.developers[0];
     return pom;
+}
+
+const deleteDefaultFolder = (groupId: string, artifactId: string, projectPath: string): void => {
+    if (groupId === "it.theapplegeek" && artifactId === "spring-starter-pack") return;
+    if (groupId === "it.theapplegeek") {
+        deleteFolder(path.join(projectPath, "src", "main", "java", "it", "theapplegeek", "spring_starter_pack"));
+    } else if (groupId.startsWith("it.")) {
+        deleteFolder(path.join(projectPath, "src", "main", "java", "it", "theapplegeek"));
+    } else {
+        deleteFolder(path.join(projectPath, "src", "main", "java", "it"));
+    }
 }
 
 export {

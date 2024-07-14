@@ -1,5 +1,6 @@
-import * as fs from "node:fs";
+import fs from "fs-extra";
 import chalk from "chalk";
+import {globSync} from "glob";
 
 const readFile = (filePath: string): string => {
     if (!fs.existsSync(filePath)) {
@@ -13,16 +14,36 @@ const writeFile = (filePath: string, content: string): void => {
     fs.writeFileSync(filePath, content);
 }
 
-const createFolder = (folderPath: string): void => {
-    if (fs.existsSync(folderPath)) {
+const createFolder = (folderPath: string, failIfExist: boolean = true): void => {
+    if (failIfExist && fs.existsSync(folderPath)) {
         console.error(chalk.red(`The directory ${folderPath} already exists!`));
         process.exit(1);
     }
-    fs.mkdirSync(folderPath);
+    fs.mkdirSync(folderPath, {recursive: true});
+}
+
+const getJavaFiles = (pattern: string) => {
+    return globSync(pattern);
+}
+
+const copyFiles = (source: string, destination: string): void => {
+    fs.copySync(source, destination, {preserveTimestamps: false});
+}
+
+const deleteFolder = (folderPath: string): void => {
+    fs.removeSync(folderPath);
+}
+
+const renameFile = (oldPath: string, newPath: string): void => {
+    fs.renameSync(oldPath, newPath);
 }
 
 export {
     readFile,
     writeFile,
-    createFolder
+    createFolder,
+    getJavaFiles,
+    copyFiles,
+    deleteFolder,
+    renameFile
 }

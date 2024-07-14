@@ -11,6 +11,19 @@ const cloneStarterPack = async (projectPath: string) => {
         });
 }
 
+const commitInitialProject = async (projectPath: string) => {
+    const git: SimpleGit = simpleGit(projectPath);
+    try {
+        await git.init();
+        await git.add(".");
+        await git.commit("Initial commit");
+    } catch (error) {
+        console.error(chalk.red(`Error when creating git repository`));
+        process.exit(1);
+    }
+}
+
 export {
-    cloneStarterPack
+    cloneStarterPack,
+    commitInitialProject
 }
