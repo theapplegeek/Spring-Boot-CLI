@@ -14,5 +14,17 @@ To create a new project, run the following command:
 npx spring-boot-cli create <project-name>
 ```
 
+## Installation
+You can also install the CLI globally:
+```shell
+npm install -g spring-boot-cli
+```
+
+Then you can run the following command:
+```shell
+spring-boot-cli create <project-name>
+```
+Note: You can also use `sc` as an alias for `spring-boot-cli`.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
