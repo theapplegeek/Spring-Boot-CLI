@@ -70,7 +70,7 @@ const createCommand: Command = new Command("create")
         // =========================================
         // Replace imports in java files with groupId
         // =========================================
-        const javaFilePattern: string = path.join(projectPath, "src", "main", "java", "**", "*.java");
+        const javaFilePattern: string = path.posix.join(projectPath, "src", "main", "java", "**", "*.java");
         let javaFiles: string[] = getJavaFiles(javaFilePattern);
         javaFiles.forEach((file: string) => {
             let fileContent: string = readFile(file);

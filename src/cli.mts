@@ -13,11 +13,11 @@ program
     .description(description)
     .action((): void => {
         console.log(
-            chalk.green(figlet.textSync("Spring CLI", {horizontalLayout: "full"}))
+            chalk.green(figlet.textSync("Spring Boot CLI", {horizontalLayout: "full"}))
         );
-        console.log("\nWelcome to Spring CLI!");
+        console.log("\nWelcome to Spring Boot CLI!");
         console.log(description);
-        console.log("\nType 'sc --help' to see the list of commands.");
+        console.log("\nType 'spring-boot-cli --help' to see the list of commands.");
     });
 
 program.addCommand(createCommand);
