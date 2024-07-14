@@ -5,7 +5,8 @@
   "main": "dist/cli.mjs",
   "types": "module",
   "bin": {
-    "sc": "./dist/cli.mjs"
+    "sc": "./dist/cli.mjs",
+    "spring-boot-cli": "./dist/cli.mjs"
   },
   "scripts": {
     "start": "node dist/cli.mjs",
@@ -19,6 +20,11 @@
     "spring-boot-cli"
   ],
   "author": "Weibin Xu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theapplegeek/Spring-Boot-CLI.git"
+  },
+  "homepage": "https://github.com/theapplegeek/Spring-Boot-CLI.git#readme",
   "license": "MIT",
   "devDependencies": {
     "@types/figlet": "^1.5.8",
