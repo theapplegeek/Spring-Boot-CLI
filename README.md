@@ -6,7 +6,7 @@
     </a>
 </span>
 <span class="badge-githublastcommit">
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/theapplegeek/spring-boot-cli">
+    <img style="pointer-events: none" src="https://img.shields.io/github/last-commit/theapplegeek/spring-boot-cli" alt="GitHub last commit">
 </span>
 <span class="badge-buymeacoffee">
     <a href="https://www.buymeacoffee.com/weibin.xu" title="Buy me a coffee" target="_blank">
