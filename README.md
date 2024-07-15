@@ -1,10 +1,18 @@
 # Spring Boot CLI
 
-<a href="https://www.npmjs.com/package/spring-boot-cli" title="View this project on NPM">
-    <img src="https://img.shields.io/npm/v/spring-boot-cli" alt="NPM version"/>
-</a>
-<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/theapplegeek/spring-boot-cli">
-<a href="https://www.buymeacoffee.com/weibin.xu" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 20px !important;width: 72px !important;" ></a>
+<span class="badge-npmversion">
+    <a href="https://www.npmjs.com/package/spring-boot-cli" title="View this project on NPM" target="_blank">
+        <img src="https://img.shields.io/npm/v/spring-boot-cli" alt="NPM version"/>
+    </a>
+</span>
+<span class="badge-githublastcommit">
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/theapplegeek/spring-boot-cli">
+</span>
+<span class="badge-buymeacoffee">
+    <a href="https://www.buymeacoffee.com/weibin.xu" title="Buy me a coffee" target="_blank">
+        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 20px !important;width: 72px !important;"/>
+    </a>
+</span>
 
 ## Introduction
 
