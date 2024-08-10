@@ -8,11 +8,6 @@
 <span class="badge-githublastcommit">
     <img style="pointer-events: none" src="https://img.shields.io/github/last-commit/theapplegeek/spring-boot-cli" alt="GitHub last commit">
 </span>
-<span class="badge-buymeacoffee">
-    <a href="https://www.buymeacoffee.com/weibin.xu" title="Buy me a coffee" target="_blank">
-        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 20px !important;width: 72px !important;"/>
-    </a>
-</span>
 
 ## Introduction
 
