@@ -71,7 +71,10 @@ const createCommand: Command = new Command("create")
         // Replace imports in java files with groupId
         // =========================================
         const javaFilePattern: string = path.posix.join(projectPath, "src", "main", "java", "**", "*.java");
+        const javaTestFilePattern: string = path.posix.join(projectPath, "src", "test", "java", "**", "*.java");
         let javaFiles: string[] = getJavaFiles(javaFilePattern);
+        let javaTestFiles: string[] = getJavaFiles(javaTestFilePattern);
+        javaFiles.push(...javaTestFiles);
         javaFiles.forEach((file: string) => {
             let fileContent: string = readFile(file);
             fileContent = fileContent.replaceAll("it.theapplegeek.spring_starter_pack", `${groupId.replaceAll("-", "_")}.${artifactId.replaceAll("-", "_")}`);
@@ -98,8 +101,7 @@ const createCommand: Command = new Command("create")
         let applicationYmlContent: any = parseStringToYaml(applicationYmlFile);
         applicationYmlContent.spring.application.name = artifactId.split(/[.-]/).map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
         const secretKeyHex: string = crypto.randomBytes(32).toString('hex');
-        const secretKeyBase64: string = Buffer.from(secretKeyHex).toString('base64');
-        applicationYmlContent.application.security.jwt['secret-key'] = secretKeyBase64;
+        applicationYmlContent.application.security.jwt['secret-key'] = Buffer.from(secretKeyHex).toString('base64');
         applicationYmlContent = parseObjectToYamlString(applicationYmlContent);
         writeFile(applicationYmlPath, applicationYmlContent);
 
@@ -112,6 +114,10 @@ const createCommand: Command = new Command("create")
         const newFolderPath: string = path.join(projectPath, "src", "main", "java", ...groupIdSplit, ...artifactIdSplit);
         createFolder(newFolderPath, false);
         copyFiles(defaultFolderPath, newFolderPath);
+        const defaultTestFolderPath: string = path.join(projectPath, "src", "test", "java", "it", "theapplegeek", "spring_starter_pack");
+        const newTestFolderPath: string = path.join(projectPath, "src", "test", "java", ...groupIdSplit, ...artifactIdSplit);
+        createFolder(newTestFolderPath, false);
+        copyFiles(defaultTestFolderPath, newTestFolderPath);
         deleteDefaultFolder(groupId, artifactId, projectPath);
         spinner.info(`Project created at ${projectPath}`);
 
@@ -184,10 +190,13 @@ const deleteDefaultFolder = (groupId: string, artifactId: string, projectPath: s
     if (groupId === "it.theapplegeek" && artifactId === "spring-starter-pack") return;
     if (groupId === "it.theapplegeek") {
         deleteFolder(path.join(projectPath, "src", "main", "java", "it", "theapplegeek", "spring_starter_pack"));
+        deleteFolder(path.join(projectPath, "src", "test", "java", "it", "theapplegeek", "spring_starter_pack"));
     } else if (groupId.startsWith("it.")) {
         deleteFolder(path.join(projectPath, "src", "main", "java", "it", "theapplegeek"));
+        deleteFolder(path.join(projectPath, "src", "test", "java", "it", "theapplegeek"));
     } else {
         deleteFolder(path.join(projectPath, "src", "main", "java", "it"));
+        deleteFolder(path.join(projectPath, "src", "test", "java", "it"));
     }
 }
 

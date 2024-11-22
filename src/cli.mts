@@ -3,9 +3,11 @@ import {Command} from "commander";
 import figlet from "figlet";
 import chalk from "chalk";
 import {createCommand} from "./commands/create.command.mjs";
+import {readFileSync} from 'fs';
 
 const program: Command = new Command();
-const version: string = "1.0.0";
+const packageJson: any = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const version: string = packageJson.version;
 const description: string = "A CLI tool to create and manage Spring Boot projects.";
 
 program
