@@ -2,6 +2,10 @@ import fs from "fs-extra";
 import chalk from "chalk";
 import {globSync} from "glob";
 
+const existsFile = (filePath: string): boolean => {
+    return fs.existsSync(filePath);
+}
+
 const readFile = (filePath: string): string => {
     if (!fs.existsSync(filePath)) {
         console.error(chalk.red(`The file ${filePath} does not exist!`));
@@ -39,6 +43,7 @@ const renameFile = (oldPath: string, newPath: string): void => {
 }
 
 export {
+    existsFile,
     readFile,
     writeFile,
     createFolder,

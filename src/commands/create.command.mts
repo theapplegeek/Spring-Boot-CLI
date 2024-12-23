@@ -18,6 +18,7 @@ import ora, {Ora} from "ora";
 import {parseObjectToXmlString, parseStringToXml} from "../utils/xml.utils.mjs";
 import {Pom} from "../models/pom.model.mjs";
 import {parseObjectToYamlString, parseStringToYaml} from "../utils/yaml.utils.mjs";
+import {createInitFile} from "./init.command.mjs";
 
 const createCommand: Command = new Command("create")
     .command("create")
@@ -120,6 +121,14 @@ const createCommand: Command = new Command("create")
         copyFiles(defaultTestFolderPath, newTestFolderPath);
         deleteDefaultFolder(groupId, artifactId, projectPath);
         spinner.info(`Project created at ${projectPath}`);
+
+        // =========================================
+        // Create init file
+        // =========================================
+        spinner.start(`Creating init file...`);
+        const basePackagePath: string = [...groupIdSplit, ...artifactIdSplit].join("/");
+        createInitFile(basePackagePath, projectPath, false);
+        spinner.info(`Init file created at ${projectPath}/spring-cli.yml`);
 
         // =========================================
         // Commit initial project

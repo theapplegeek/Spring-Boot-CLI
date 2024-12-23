@@ -4,6 +4,7 @@ import figlet from "figlet";
 import chalk from "chalk";
 import {createCommand} from "./commands/create.command.mjs";
 import {readFileSync} from 'fs';
+import {initCommand} from "./commands/init.command.mjs";
 
 const program: Command = new Command();
 const packageJson: any = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
@@ -23,5 +24,6 @@ program
     });
 
 program.addCommand(createCommand);
+program.addCommand(initCommand);
 
 program.parse(process.argv);
