@@ -1,3 +1,3 @@
 export interface ConfigFile {
-    basePackagePath: string;
+  basePackagePath: string;
 }

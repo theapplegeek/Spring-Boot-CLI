@@ -28,6 +28,7 @@
   "homepage": "https://github.com/theapplegeek/Spring-Boot-CLI.git#readme",
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/figlet": "^1.5.8",
     "@types/fs-extra": "^11.0.4",
     "@types/glob": "^8.1.0",
