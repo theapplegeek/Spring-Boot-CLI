@@ -11,7 +11,10 @@
   "scripts": {
     "start": "node dist/cli.mjs",
     "build": "tsc",
-    "build-publish": "tsc && npm publish"
+    "build-publish": "tsc && npm publish",
+    "format": "biome format --write src",
+    "lint": "biome lint --write src",
+    "check": "biome check --write src"
   },
   "keywords": [
     "spring",
@@ -42,6 +45,7 @@
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
+    "ejs": "^3.1.10",
     "figlet": "^1.7.0",
     "fs-extra": "^11.2.0",
     "glob": "^11.0.0",
